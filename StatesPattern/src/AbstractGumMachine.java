@@ -1,6 +1,6 @@
 import states.States;
 
-public abstract class AbstractGumMachine {
+public abstract class AbstractGumMachine implements Runnable {
     protected States state;
     protected int counterGum = 10;
 
@@ -9,17 +9,26 @@ public abstract class AbstractGumMachine {
         System.out.println("Включили автомат");
     }
 
-    public void throwCoin(){
-            state = States.HAS_COIN;
+    public synchronized void throwCoin() throws InterruptedException {
+        wait(5000);
+        state = States.HAS_COIN;
         System.out.println("Кинули монетку");
     }
 
-    public void pullTheLever(){
+    public synchronized void pullTheLever() throws InterruptedException {
+        wait(1000);
         state = States.LOTTERY;
         System.out.println("Дернули за рычаг");
     }
 
-    public void conductLottery(){
+    public synchronized void giveCoin() throws InterruptedException {
+        wait(1000);
+        state = States.NO_COIN;
+        System.out.println("Вернули монету");
+    }
+
+    public synchronized void conductLottery() throws InterruptedException {
+        wait(1000);
         if ((Math.round(Math.random() * 2)) == 2 && counterGum >= 2){
             state = States.GIVE_PRIZE;
             System.out.println("Выйграли приз");
@@ -29,13 +38,15 @@ public abstract class AbstractGumMachine {
         }
     }
 
-    public void givePrize(){
+    public synchronized void givePrize() throws InterruptedException {
+        wait(1000);
         counterGum--;
         state = States.GIVE_GUM;
         System.out.println("Приз выдан");
     }
 
-    public void giveGum(){
+    public synchronized void giveGum() throws InterruptedException {
+        wait(1000);
         System.out.println("Жвачка выдана");
         if (--counterGum == 0){
             state = States.NO_GUM;
@@ -49,7 +60,8 @@ public abstract class AbstractGumMachine {
 
     }
 
-    public void spreadGum(int gums){
+    public synchronized void spreadGum(int gums) throws InterruptedException {
+        wait(10000);
         counterGum = gums;
         state = States.NO_COIN;
         System.out.println("Жвачка засыпана");
